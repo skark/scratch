@@ -1,0 +1,32 @@
+name: datascience
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - bcolz
+  - code-server
+  - cpuonly
+  - feather-format
+  - ipywidgets
+  - jupyter-server-proxy
+  - matplotlib
+  - numpy
+  - opencv
+  - pandas
+  - pytorch
+  - scikit-image
+  - scikit-learn
+  - scipy
+  - seaborn
+  - spacy
+  - sympy
+  - tensorflow-mkl
+  - torchtext
+  - torchvision
+  - pip:
+    - isoweek
+    - jupyter-offlinenotebook
+    - pandas-summary
+    - sklearn-pandas
+
