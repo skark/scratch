@@ -5,11 +5,9 @@ channels:
   - defaults
 dependencies:
   - bcolz
-  - code-server
   - cpuonly
   - feather-format
   - ipywidgets
-  - jupyter-server-proxy
   - matplotlib
   - numpy
   - opencv
@@ -24,6 +22,8 @@ dependencies:
   - tensorflow-mkl
   - torchtext
   - torchvision
+  - jupyter-server-proxy
+  - code-server
   - pip:
     - isoweek
     - jupyter-offlinenotebook
