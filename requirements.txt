@@ -1,0 +1,15 @@
+torchtext
+feather-format
+scipy
+matplotlib
+scikit-image
+spacy
+sklearn-pandas
+isoweek
+pandas_summary
+tensorflow-cpu
+opencv-python
+jupyter-offlinenotebook
+-f https://download.pytorch.org/whl/cpu/torch_stable.html
+torch
+torchvision
