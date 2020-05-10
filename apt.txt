@@ -3,3 +3,4 @@ texlive-latex-extra
 texlive-fonts-recommended
 cm-super
 wget
+apt-transport-https
