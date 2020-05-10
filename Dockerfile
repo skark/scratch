@@ -91,7 +91,10 @@ RUN cd /tmp && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN set -o xtrace && \
-    conda env update -f "environment.yml" && \
+    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy -c conda-forge && \
+    conda install -q -y jupyter-server-proxy code-server && \
+    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
+    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
     conda clean --all -f -y && \
     jupyter notebook --generate-config && \
     jupyter serverextension enable --py jupyter_server_proxy && \
