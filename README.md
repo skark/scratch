@@ -1,4 +1,4 @@
-# VS Code on Binder
+# VS Code on Binder 
 
 VS Code on Binder, because sometimes you need a real editor.
 
