@@ -79,25 +79,27 @@ RUN set -o xtrace && \
     conda config --system --set show_channel_urls true && \
     conda install --quiet --yes conda && \
     conda install --quiet --yes pip && \
-    conda update --all --quiet --yes && \
-    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy pylint -c conda-forge && \
-    conda install -q -y jupyter-server-proxy code-server && \
-    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
-    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
+    conda env update -f "environment.yml" && \ 
     conda clean --all -f -y && \
     jupyter notebook --generate-config && \
     jupyter serverextension enable --py jupyter_server_proxy && \
     jupyter labextension install @jupyterlab/server-proxy && \
     jupyter lab build && \
     pip install -e. && \
-    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
-    dotnet interactive jupyter install && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     set +o xtrace
+
+#    conda update --all --quiet --yes && \
+#    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy pylint -c conda-forge && \
+#    conda install -q -y jupyter-server-proxy code-server && \
+#    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
+#    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
+#    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
+#    dotnet interactive jupyter install && \
     
-RUN code-server --install-extension ms-python.python ; exit 0
-RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
+#RUN code-server --install-extension ms-python.python ; exit 0
+#RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
 
 EXPOSE 8888
 
