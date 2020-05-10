@@ -34,7 +34,6 @@ RUN apt-get update \
     sudo \
     locales \
     fonts-liberation \
-    run-one \
     git cm-super keychain libsm6 libxext6 libxrender1 dvipng texlive-latex-extra texlive-fonts-recommended \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
  
