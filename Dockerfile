@@ -77,7 +77,6 @@ RUN cd /tmp && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set auto_update_conda false && \
     conda config --system --set show_channel_urls true && \
-    conda config --system --set channel_priority strict && \
     conda install --quiet --yes conda && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
