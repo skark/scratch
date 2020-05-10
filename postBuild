@@ -9,19 +9,19 @@ jupyter lab build
 # Install the VS code proxy
 pip install -e.
 
-wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-sudo dpkg -i packages-microsoft-prod.deb
-sudo add-apt-repository universe
-sudo apt-get update
-sudo apt-get install apt-transport-https
-sudo apt-get update
-sudo apt-get install dotnet-sdk-3.1
+#wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+#sudo dpkg -i packages-microsoft-prod.deb
+#sudo add-apt-repository universe
+#sudo apt-get update
+#sudo apt-get install apt-transport-https
+#sudo apt-get update
+#sudo apt-get install dotnet-sdk-3.1
 
-export DOTNET_CLI_TELEMETRY_OPTOUT=true
-export PATH="$PATH:/$USER/.dotnet/tools"
+#export DOTNET_CLI_TELEMETRY_OPTOUT=true
+#export PATH="$PATH:/$USER/.dotnet/tools"
 
-dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive
-dotnet interactive jupyter install
+#dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive
+#dotnet interactive jupyter install
 
 #code-server --install-extension ms-python.python
 #code-server --install-extension ms-dotnettools.csharp
