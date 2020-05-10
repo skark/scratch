@@ -4,3 +4,4 @@ texlive-fonts-recommended
 cm-super
 wget
 apt-transport-https
+software-properties-common
