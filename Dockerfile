@@ -90,10 +90,12 @@ RUN cd /tmp && \
 # Correct permissions
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
-RUN conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy -c conda-forge && \
+RUN set -o xtrace && \
+    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy -c conda-forge && \
     conda install -q -y jupyter-server-proxy code-server && \
     conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
     pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
+    export PATH="$PATH:/home/jovyan/.dotnet/tools" && \
     dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install && \
     conda clean --all -f -y && \
@@ -104,7 +106,8 @@ RUN conda install --quiet --yes notebook jupyterlab feather-format opencv scipy 
     jupyter lab build && \
     pip install -e. && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn 
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    set +o xtrace
     
 RUN code-server --install-extension ms-python.python ; exit 0
 RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
