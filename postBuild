@@ -1,7 +1,9 @@
 #!/bin/bash
 
+conda update --all -y
+
 # Enable the proxy extension in notebook and lab
-jupyter serverextension enable --py jupyter_server_proxy
+jupyter serverextension enable --sys-prefix jupyter_server_proxy
 jupyter labextension install @jupyterlab/server-proxy
 jupyter lab build
 
