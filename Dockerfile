@@ -48,11 +48,9 @@ ENV CONDA_DIR=/opt/conda \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
+
 ENV PATH=$CONDA_DIR/bin:$PATH \
     HOME=/home/$NB_USER
-    
-COPY fix-permissions /usr/local/bin/fix-permissions
-RUN chmod a+rx /usr/local/bin/fix-permissions
 
 # Enable prompt color in the skeleton .bashrc before creating the default NB_USER
 RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
@@ -64,16 +62,13 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
     mkdir -p $CONDA_DIR && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
-    chmod g+w /etc/passwd && \
-    fix-permissions $HOME && \
-    fix-permissions $CONDA_DIR
+    chmod g+w /etc/passwd
 
 USER $NB_UID
 WORKDIR $HOME
 
 # Setup work directory for backward-compatibility
-RUN mkdir /home/$NB_USER/work && \
-    fix-permissions /home/$NB_USER
+RUN mkdir /home/$NB_USER/work
 
 RUN cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -87,9 +82,7 @@ RUN cd /tmp && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
     conda clean --all -f -y && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    rm -rf /home/$NB_USER/.cache/yarn
 
 # Install Jupyter Notebook, Lab, and Hub
 # Generate a notebook server config
@@ -111,9 +104,7 @@ RUN conda install --quiet --yes notebook jupyterlab feather-format opencv scipy 
     jupyter lab build && \
     pip install -e. && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    rm -rf /home/$NB_USER/.cache/yarn 
     
 RUN code-server --install-extension ms-python.python ; exit 0
 RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
@@ -122,10 +113,6 @@ EXPOSE 8888
 
 # Configure container startup
 ENTRYPOINT []
-
-# Fix permissions on /etc/jupyter as root
-USER root
-RUN fix-permissions /etc/jupyter/
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
