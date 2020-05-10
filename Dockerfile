@@ -19,7 +19,7 @@ USER ${NB_USER}
 
 ENV CONDA_DIR=/condinst \
         DOTNET_CLI_TELEMETRY_OPTOUT=true \
-        PATH="$PATH:$CONDA_DIR/bin:/root/.dotnet/tools"
+        PATH="$PATH:$CONDA_DIR/bin:/$NB_USER/.dotnet/tools"
         
 USER root
 
@@ -91,13 +91,10 @@ RUN cd /tmp && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN set -o xtrace && \
-    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy -c conda-forge && \
-    conda install -q -y jupyter-server-proxy code-server && \
-    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
-    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
     export PATH="$PATH:/home/jovyan/.dotnet/tools" && \
     dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install && \
+    conda env update -f "environment.yml" && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
