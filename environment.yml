@@ -23,6 +23,8 @@ dependencies:
   - tensorflow-mkl
   - torchtext
   - torchvision
+  - notebook
+  - jupyterlab 
   - jupyter-server-proxy
   - code-server
   - pip:

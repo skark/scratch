@@ -91,10 +91,10 @@ RUN cd /tmp && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN set -o xtrace && \
+    conda env update -f "environment.yml" && \
     export PATH="$PATH:/home/jovyan/.dotnet/tools" && \
     dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install && \
-    conda env update -f "environment.yml" && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
