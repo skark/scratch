@@ -81,6 +81,9 @@ RUN set -o xtrace && \
     conda install --quiet --yes pip && \
     conda env update -f "environment.yml" && \ 
     conda clean --all -f -y && \
+    conda activate datascience && \
+    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
+    dotnet interactive jupyter install && \
     jupyter notebook --generate-config && \
     jupyter serverextension enable --py jupyter_server_proxy && \
     jupyter labextension install @jupyterlab/server-proxy && \
@@ -95,8 +98,7 @@ RUN set -o xtrace && \
 #    conda install -q -y jupyter-server-proxy code-server && \
 #    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
 #    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
-#    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
-#    dotnet interactive jupyter install && \
+
     
 #RUN code-server --install-extension ms-python.python ; exit 0
 #RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
