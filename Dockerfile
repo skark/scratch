@@ -19,7 +19,7 @@ USER ${NB_USER}
 
 ENV CONDA_DIR=/condinst \
         DOTNET_CLI_TELEMETRY_OPTOUT=true \
-        PATH="$PATH:$CONDA_DIR/bin:/$NB_USER/.dotnet/tools"
+        PATH="$PATH:$CONDA_DIR/bin:${HOME}/.dotnet/tools"
         
 USER root
 
@@ -37,7 +37,7 @@ RUN apt-get update \
     git cm-super keychain libsm6 libxext6 libxrender1 dvipng texlive-latex-extra texlive-fonts-recommended \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
  
-COPY startup/*.py /jovyan/.ipython/profile_default/startup/
+COPY startup/*.py ${HOME}/.ipython/profile_default/startup/
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
@@ -92,9 +92,6 @@ RUN cd /tmp && \
 # files across image layers when the permissions change
 RUN set -o xtrace && \
     conda env update -f "environment.yml" && \
-    export PATH="$PATH:/home/jovyan/.dotnet/tools" && \
-    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
-    dotnet interactive jupyter install && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -102,6 +99,8 @@ RUN set -o xtrace && \
     jupyter labextension install @jupyterlab/server-proxy && \
     jupyter lab build && \
     pip install -e. && \
+    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
+    dotnet interactive jupyter install && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     set +o xtrace
