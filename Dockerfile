@@ -93,7 +93,6 @@ RUN cd /tmp && \
 RUN set -o xtrace && \
     conda env update -f "environment.yml" && \
     conda clean --all -f -y && \
-    npm cache clean --force && \
     jupyter notebook --generate-config && \
     jupyter serverextension enable --py jupyter_server_proxy && \
     jupyter labextension install @jupyterlab/server-proxy && \
