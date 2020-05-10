@@ -74,21 +74,15 @@ RUN set -o xtrace && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     /bin/bash Miniconda3-latest-Linux-x86_64.sh -f -b -p $CONDA_DIR  && \
     rm Miniconda3-latest-Linux-x86_64.sh  && \
+    conda init && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set auto_update_conda false && \
     conda config --system --set show_channel_urls true && \
     conda install --quiet --yes conda && \
     conda install --quiet --yes pip && \
     conda env update -f "environment.yml" && \ 
-    conda clean --all -f -y
-
-USER root
-
-RUN ${CONDA_DIR}/etc/profile.d/conda.sh
-
-USER $NB_UID
-
-RUN conda activate datascience && \
+    conda activate datascience && \
+    conda clean --all -f -y && \
     dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install && \
     jupyter notebook --generate-config && \
