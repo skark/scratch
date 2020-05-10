@@ -71,7 +71,6 @@ WORKDIR $HOME
 RUN mkdir /home/$NB_USER/work
 
 RUN set -o xtrace && \
-    cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     /bin/bash Miniconda3-latest-Linux-x86_64.sh -f -b -p $CONDA_DIR  && \
     rm Miniconda3-latest-Linux-x86_64.sh  && \
