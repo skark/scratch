@@ -70,7 +70,8 @@ WORKDIR $HOME
 # Setup work directory for backward-compatibility
 RUN mkdir /home/$NB_USER/work
 
-RUN cd /tmp && \
+RUN set -o xtrace && \
+    cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     /bin/bash Miniconda3-latest-Linux-x86_64.sh -f -b -p $CONDA_DIR  && \
     rm Miniconda3-latest-Linux-x86_64.sh  && \
@@ -80,17 +81,7 @@ RUN cd /tmp && \
     conda install --quiet --yes conda && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
-    conda clean --all -f -y && \
-    rm -rf /home/$NB_USER/.cache/yarn
-
-# Install Jupyter Notebook, Lab, and Hub
-# Generate a notebook server config
-# Cleanup temporary files
-# Correct permissions
-# Do all this in a single RUN command to avoid duplicating all of the
-# files across image layers when the permissions change
-RUN set -o xtrace && \
-    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy -c conda-forge && \
+    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy pylint -c conda-forge && \
     conda install -q -y jupyter-server-proxy code-server && \
     conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
     pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
