@@ -81,6 +81,7 @@ RUN set -o xtrace && \
     conda install --quiet --yes pip && \
     conda env update -f "environment.yml" && \ 
     conda clean --all -f -y && \
+    ${CONDA_DIR}/etc/profile.d/conda.sh && \
     conda activate datascience && \
     dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install && \
