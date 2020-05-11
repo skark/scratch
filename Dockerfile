@@ -134,8 +134,8 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=true \
 USER ${NB_USER}
 
 # Make sure that postBuild scripts are marked executable before executing them
-RUN chmod +x postBuild
-RUN ./postBuild
+RUN chmod +x postbuild
+RUN ./postbuild
 
 # Add start script
 # Add entrypoint
