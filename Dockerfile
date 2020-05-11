@@ -137,10 +137,4 @@ USER ${NB_USER}
 RUN chmod +x postBuild
 RUN /bin/bash ./postBuild
 
-# Add start script
-# Add entrypoint
-COPY /repo2docker-entrypoint /usr/local/bin/repo2docker-entrypoint
-ENTRYPOINT ["/usr/local/bin/repo2docker-entrypoint"]
-
-# Specify the default command to run
-CMD ["jupyter", "lab", "--ip", "0.0.0.0"]
+ENTRYPOINT []
