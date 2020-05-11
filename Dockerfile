@@ -106,7 +106,7 @@ ENV CONDA_DEFAULT_ENV ${KERNEL_PYTHON_PREFIX}
 # example installing APT packages.
 # If scripts required during build are present, copy them
 
-COPY src/environment.yml ${REPO_DIR}/environment.yml
+COPY environment.yml ${REPO_DIR}/environment.yml
 USER root
 RUN chown -R ${NB_USER}:${NB_USER} ${REPO_DIR}
 RUN apt-get -qq update && \
@@ -117,6 +117,7 @@ rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
 RUN conda env update -p ${NB_PYTHON_PREFIX} -f "environment.yml" && \
+conda update --all -y
 conda clean --all -f -y && \
 conda list -p ${NB_PYTHON_PREFIX}
 
