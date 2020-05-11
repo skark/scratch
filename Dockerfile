@@ -163,18 +163,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
 	USER=${NB_USER} \
 	HOME=/home/${NB_USER}
 
-RUN groupadd \
-        --gid ${NB_UID} \
-        ${NB_USER} && \
-    useradd \
-        --comment "Default user" \
-        --create-home \
-        --gid ${NB_UID} \
-        --no-log-init \
-        --shell /bin/bash \
-        --uid ${NB_UID} \
-        ${NB_USER}
-
 ENV APP_BASE=/srv \
 	NPM_DIR=${APP_BASE}/npm \
 	NPM_CONFIG_GLOBALCONFIG=${NPM_DIR}/npmrc \
