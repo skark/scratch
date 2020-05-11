@@ -117,7 +117,7 @@ rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
 RUN conda env update -p ${NB_PYTHON_PREFIX} -f "environment.yml" && \
-conda update --all -y
+conda update --all -y && \
 conda clean --all -f -y && \
 conda list -p ${NB_PYTHON_PREFIX}
 
