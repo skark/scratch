@@ -134,6 +134,9 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=true \
 USER ${NB_USER}
 
 # Make sure that postBuild scripts are marked executable before executing them
+RUN ls -a
+RUN pwd
+RUN ls ${REPO_DIR} -a
 RUN chmod +x postbuild
 RUN ./postbuild
 
