@@ -135,7 +135,7 @@ USER ${NB_USER}
 
 # Make sure that postBuild scripts are marked executable before executing them
 RUN chmod +x postBuild
-RUN postBuild
+RUN /bin/bash ./postBuild
 
 # Add start script
 # Add entrypoint
