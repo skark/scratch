@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
 
 # avoid prompts from apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -137,4 +137,50 @@ USER ${NB_USER}
 RUN chmod +x postBuild
 RUN /bin/bash ./postBuild
 
+ENTRYPOINT []
+
+FROM scratch as final
+COPY --from=build / /
+
+# Set up user
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+
+ENV DEBIAN_FRONTEND=noninteractive \
+	LC_ALL en_US.UTF-8 \
+	LANG en_US.UTF-8 \
+	LANGUAGE en_US.UTF-8 \
+	SHELL /bin/bash \
+	USER ${NB_USER} \
+	HOME /home/${NB_USER}
+
+RUN groupadd \
+        --gid ${NB_UID} \
+        ${NB_USER} && \
+    useradd \
+        --comment "Default user" \
+        --create-home \
+        --gid ${NB_UID} \
+        --no-log-init \
+        --shell /bin/bash \
+        --uid ${NB_UID} \
+        ${NB_USER}
+
+ENV APP_BASE /srv \
+	NPM_DIR ${APP_BASE}/npm \
+	NPM_CONFIG_GLOBALCONFIG ${NPM_DIR}/npmrc \
+	CONDA_DIR ${APP_BASE}/conda \
+	NB_PYTHON_PREFIX ${CONDA_DIR}/envs/notebook \
+	KERNEL_PYTHON_PREFIX ${NB_PYTHON_PREFIX}
+
+ARG REPO_DIR=${HOME}
+ENV REPO_DIR ${REPO_DIR} \
+	CONDA_DEFAULT_ENV ${KERNEL_PYTHON_PREFIX} \
+	DOTNET_CLI_TELEMETRY_OPTOUT=true \
+	PATH ${HOME}/.local/bin:${REPO_DIR}/.local/bin:${PATH}:$CONDA_DIR/bin:${HOME}/.dotnet/tools"
+
+USER ${NB_USER}
+
+WORKDIR ${REPO_DIR}
+EXPOSE 8888
 ENTRYPOINT []
