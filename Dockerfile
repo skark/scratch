@@ -124,7 +124,7 @@ conda list -p ${NB_PYTHON_PREFIX}
 # Copy and chown stuff. This doubles the size of the repo, because
 # you can't actually copy as USER, only as root! Thanks, Docker!
 USER root
-COPY / ${REPO_DIR}
+COPY . ${REPO_DIR}
 RUN chown -R ${NB_USER}:${NB_USER} ${REPO_DIR}
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=true \
