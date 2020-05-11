@@ -137,6 +137,15 @@ USER ${NB_USER}
 RUN chmod +x postBuild
 RUN /bin/bash ./postBuild
 
+USER root
+RUN $CONDA_DIR -type f -name "*.py[co]" -delete \
+	&& find $CONDA_DIR -type f -name "*.js.map" -delete \
+	&& find $CONDA_DIR -path '*/__pycache__/*' -delete \
+	&& find $CONDA_DIR -type d -name "__pycache__" -delete
+	&& rm postBuild
+
+USER ${NB_USER}
+
 ENTRYPOINT []
 
 FROM scratch as final
