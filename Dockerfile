@@ -1,113 +1,145 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1
 
+# avoid prompts from apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set up locales properly
+RUN apt-get -qq update && \
+    apt-get -qq install --yes --no-install-recommends locales > /dev/null && \
+    apt-get -qq purge && \
+    apt-get -qq clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+# Use bash as default shell, rather than sh
+ENV SHELL /bin/bash
+
+# Set up user
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
-RUN adduser --disabled-password \
-    --gecos "Default user" \
-    --uid ${NB_UID} \
-    ${NB_USER}
-    
-# Make sure the contents of our repo are in ${HOME}
-COPY . ${HOME}
-USER root
-RUN chown -R ${NB_UID} ${HOME}
-USER ${NB_USER}
+RUN groupadd \
+        --gid ${NB_UID} \
+        ${NB_USER} && \
+    useradd \
+        --comment "Default user" \
+        --create-home \
+        --gid ${NB_UID} \
+        --no-log-init \
+        --shell /bin/bash \
+        --uid ${NB_UID} \
+        ${NB_USER}
 
-ENV CONDA_DIR=/condinst \
-        DOTNET_CLI_TELEMETRY_OPTOUT=true \
-        PATH="$PATH:$CONDA_DIR/bin:${HOME}/.dotnet/tools"
-        
-USER root
+RUN wget --quiet -O - https://deb.nodesource.com/gpgkey/nodesource.gpg.key |  apt-key add - && \
+    DISTRO="bionic" && \
+    echo "deb https://deb.nodesource.com/node_10.x $DISTRO main" >> /etc/apt/sources.list.d/nodesource.list && \
+    echo "deb-src https://deb.nodesource.com/node_10.x $DISTRO main" >> /etc/apt/sources.list.d/nodesource.list
 
-# Install all OS dependencies for notebook server that starts but lacks all
-# features (e.g., download as all possible file formats)
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
-    wget \
-    bzip2 \
-    ca-certificates \
-    sudo \
-    locales \
-    fonts-liberation \
-    git cm-super keychain libsm6 libxext6 libxrender1 dvipng texlive-latex-extra texlive-fonts-recommended \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
- 
-COPY startup/*.py ${HOME}/.ipython/profile_default/startup/
-
-# Configure environment
-ENV CONDA_DIR=/opt/conda \
-    SHELL=/bin/bash \
-    NB_USER=$NB_USER \
-    NB_UID=$NB_UID \
-    NB_GID=$NB_GID \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
-
-ENV PATH=$CONDA_DIR/bin:$PATH \
-    HOME=/home/$NB_USER
-
-# Enable prompt color in the skeleton .bashrc before creating the default NB_USER
-RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
-
-# Create NB_USER with name jovyan user with UID=1000 and in the 'users' group
-# and make sure these dirs are writable by the `users` group.
-RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
-    sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
-    sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
-    mkdir -p $CONDA_DIR && \
-    chown $NB_USER:$NB_GID $CONDA_DIR && \
-    chmod g+w /etc/passwd
-
-USER $NB_UID
-WORKDIR $HOME
-
-# Setup work directory for backward-compatibility
-RUN mkdir /home/$NB_USER/work
-
-RUN set -o xtrace && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    /bin/bash Miniconda3-latest-Linux-x86_64.sh -f -b -p $CONDA_DIR  && \
-    rm Miniconda3-latest-Linux-x86_64.sh  && \
-    conda init && \
-    conda config --system --prepend channels conda-forge && \
-    conda config --system --set auto_update_conda false && \
-    conda config --system --set show_channel_urls true && \
-    conda install --quiet --yes conda && \
-    conda install --quiet --yes pip && \
-    conda env update -f "environment.yml" && \ 
-    conda activate datascience && \
-    conda clean --all -f -y && \
-    dotnet tool install -g --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" Microsoft.dotnet-interactive && \
-    dotnet interactive jupyter install && \
-    jupyter notebook --generate-config && \
-    jupyter serverextension enable --py jupyter_server_proxy && \
-    jupyter labextension install @jupyterlab/server-proxy && \
-    jupyter lab build && \
-    pip install -e. && \
-    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    set +o xtrace
-
-#    conda update --all --quiet --yes && \
-#    conda install --quiet --yes notebook jupyterlab feather-format opencv scipy matplotlib scikit-image spacy pylint -c conda-forge && \
-#    conda install -q -y jupyter-server-proxy code-server && \
-#    conda install -q -y pytorch torchvision torchtext cpuonly -c pytorch && \
-#    pip install --no-cache-dir sklearn-pandas isoweek pandas_summary jupyter-offlinenotebook && \
-
-    
-#RUN code-server --install-extension ms-python.python ; exit 0
-#RUN code-server --install-extension ms-dotnettools.csharp ; exit 0
+# Base package installs are not super interesting to users, so hide their outputs
+# If install fails for some reason, errors will still be printed
+RUN apt-get -qq update && \
+    apt-get -qq install --yes --no-install-recommends \
+       less \
+       nodejs \
+       unzip \
+       > /dev/null && \
+    apt-get -qq purge && \
+    apt-get -qq clean && \
+    rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8888
 
-# Configure container startup
-ENTRYPOINT []
+# Environment variables required for build
+ENV APP_BASE /srv
+ENV NPM_DIR ${APP_BASE}/npm
+ENV NPM_CONFIG_GLOBALCONFIG ${NPM_DIR}/npmrc
+ENV CONDA_DIR ${APP_BASE}/conda
+ENV NB_PYTHON_PREFIX ${CONDA_DIR}/envs/notebook
+ENV KERNEL_PYTHON_PREFIX ${NB_PYTHON_PREFIX}
+# Special case PATH
+ENV PATH ${NB_PYTHON_PREFIX}/bin:${CONDA_DIR}/bin:${NPM_DIR}/bin:${PATH}
+# If scripts required during build are present, copy them
 
-# Switch back to jovyan to avoid accidental container runs as root
-USER $NB_UID
+COPY conda/activate-conda.sh /etc/profile.d/activate-conda.sh
+
+COPY conda/environment.frozen.yml /tmp/environment.yml
+
+COPY conda/install-miniforge.bash /tmp/install-miniforge.bash
+RUN mkdir -p ${NPM_DIR} && \
+chown -R ${NB_USER}:${NB_USER} ${NPM_DIR}
+
+USER ${NB_USER}
+RUN npm config --global set prefix ${NPM_DIR}
+
+USER root
+RUN bash /tmp/install-miniforge.bash && \
+rm /tmp/install-miniforge.bash /tmp/environment.yml
+
+# Allow target path repo is cloned to be configurable
+ARG REPO_DIR=${HOME}
+ENV REPO_DIR ${REPO_DIR}
+WORKDIR ${REPO_DIR}
+
+# We want to allow two things:
+#   1. If there's a .local/bin directory in the repo, things there
+#      should automatically be in path
+#   2. postBuild and users should be able to install things into ~/.local/bin
+#      and have them be automatically in path
+#
+# The XDG standard suggests ~/.local/bin as the path for local user-specific
+# installs. See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+ENV PATH ${HOME}/.local/bin:${REPO_DIR}/.local/bin:${PATH}
+
+# The rest of the environment
+ENV CONDA_DEFAULT_ENV ${KERNEL_PYTHON_PREFIX}
+# Run pre-assemble scripts! These are instructions that depend on the content
+# of the repository but don't access any files in the repository. By executing
+# them before copying the repository itself we can cache these steps. For
+# example installing APT packages.
+# If scripts required during build are present, copy them
+
+COPY src/environment.yml ${REPO_DIR}/environment.yml
+USER root
+RUN chown -R ${NB_USER}:${NB_USER} ${REPO_DIR}
+RUN apt-get -qq update && \
+apt-get install --yes --no-install-recommends apt-transport-https cm-super dvipng software-properties-common texlive-fonts-recommended texlive-latex-extra wget git keychain libsm6 libxext6 libxrender1 && \
+apt-get -qq purge && \
+apt-get -qq clean && \
+rm -rf /var/lib/apt/lists/*
+
+USER ${NB_USER}
+RUN conda env update -p ${NB_PYTHON_PREFIX} -f "environment.yml" && \
+conda clean --all -f -y && \
+conda list -p ${NB_PYTHON_PREFIX}
+
+# Copy and chown stuff. This doubles the size of the repo, because
+# you can't actually copy as USER, only as root! Thanks, Docker!
+USER root
+COPY src/ ${REPO_DIR}
+RUN chown -R ${NB_USER}:${NB_USER} ${REPO_DIR}
+
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=true \
+        PATH="$PATH:$CONDA_DIR/bin:${HOME}/.dotnet/tools"
+
+# We always want containers to run as non-root
+USER ${NB_USER}
+
+# Make sure that postBuild scripts are marked executable before executing them
+RUN chmod +x postBuild
+RUN ./postBuild
+
+# Add start script
+# Add entrypoint
+COPY /repo2docker-entrypoint /usr/local/bin/repo2docker-entrypoint
+ENTRYPOINT ["/usr/local/bin/repo2docker-entrypoint"]
+
+# Specify the default command to run
+CMD ["jupyter", "lab", "--ip", "0.0.0.0"]
