@@ -135,6 +135,7 @@ USER ${NB_USER}
 
 # Make sure that postBuild scripts are marked executable before executing them
 RUN chmod +x postbuild.sh
+RUN ls postbuild.sh && pwd && ls -a && cat postbuild.sh
 RUN postbuild.sh
 
 # Add start script
