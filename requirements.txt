@@ -6,6 +6,7 @@ scikit-image
 seaborn 
 spacy
 sklearn-pandas
+statsmodels
 sympy
 isoweek
 pandas_summary
