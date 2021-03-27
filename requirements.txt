@@ -3,6 +3,7 @@ feather-format
 scipy
 matplotlib
 scikit-image
+seaborn 
 spacy
 sklearn-pandas
 sympy
