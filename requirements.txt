@@ -5,6 +5,7 @@ matplotlib
 scikit-image
 spacy
 sklearn-pandas
+sympy
 isoweek
 pandas_summary
 tensorflow-cpu
